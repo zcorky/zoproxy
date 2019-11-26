@@ -255,8 +255,6 @@ export class Proxy extends Onion {
           message = await response.text();
         }
 
-        this.logger.debug('message: ', message);
-
         // @TODO
         const body = JSON.stringify({
           method, path, status,
