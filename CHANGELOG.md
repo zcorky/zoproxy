@@ -5,12 +5,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 0.0.2 (2019-11-26)
 
-**Note:** Version bump only for package @zoproxy/core
-
-
-
-
-
-## 0.0.1 (2019-11-25)
-
-**Note:** Version bump only for package @zoproxy/core
+**Note:** Version bump only for package root
