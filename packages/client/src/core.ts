@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import { Proxy } from '@zoproxy/core';
+import { Response } from 'node-fetch';
 
 import { getLogger } from '@zodash/logger';
 
@@ -68,6 +69,24 @@ export class ProxyClient {
     const headers = this.getHeaders();
     const body = JSON.stringify(this.getBody(input, options));
 
-    return this.core.request({ method, path, headers, body });
+    const response = await this.core.request({ method, path, headers, body });
+    
+    if (response.status >= 400 && response.status < 600) {
+      const originBody = await response.json();
+      
+      // the real method and path
+      const { method, path } = input;
+      const _body = JSON.stringify({ ...originBody, method, path });
+
+      const _errorResponse = new Response(_body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
+
+      return _errorResponse;
+    }
+
+    return response;
   }
 }
