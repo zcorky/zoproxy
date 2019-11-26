@@ -16,6 +16,7 @@ app.use(body());
 app.use((() => {
   const proxy = new Proxy({
     target: 'https://httpbin.zcorky.com',
+    enableDynamicTarget: true,
   });
 
   return async (ctx, next) => {

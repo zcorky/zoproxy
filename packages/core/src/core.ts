@@ -1,6 +1,6 @@
 import * as stream from 'stream';
 import { Response } from 'node-fetch';
-import { Onion, Middleware, Context } from '@zodash/onion';
+import { Onion, Input, Middleware, Context } from '@zodash/onion';
 import { getLogger } from '@zodash/logger';
 import LRU from '@zcorky/lru';
 import { md5 } from '@zodash/crypto/lib/md5';
@@ -9,10 +9,11 @@ import { omit } from '@zodash/omit';
 import { request } from './utils/request';
 
 import {
-  RequestOptions,
+  Config,
   RequestInput, RequestOutput,
 } from './interface';
 
+import { getTarget } from './utils/get-target';
 import { getUrl } from './utils/get-url';
 import { getBody } from './utils/get-body';
 
@@ -20,7 +21,7 @@ const debug = require('debug')('datahub');
 
 declare module '@zodash/onion' {
   export interface Input extends RequestInput {
-    
+
   }
 
   export interface Output extends RequestOutput {
@@ -32,7 +33,8 @@ declare module '@zodash/onion' {
       readonly requestStartTime: number;
       readonly requestCount: { all: number, fail: number, count(type: 'all' | 'fail'): void };
       readonly requestCache: LRU<string, RequestOutput>;
-      
+      readonly target: string;
+
       requestTime: number;
 
       md5Key: string;
@@ -43,7 +45,7 @@ declare module '@zodash/onion' {
 export class Proxy extends Onion {
   private logger = getLogger('datahub');;
 
-  constructor(public readonly options: RequestOptions) {
+  constructor(public readonly config: Config) {
     super();
 
     this.setup();
@@ -51,10 +53,9 @@ export class Proxy extends Onion {
 
   public handle(): Middleware<Context> {
     return async (ctx) => {
-      const { target } = this.options!;
       const { method, path, headers, body: _body } = ctx.input;
 
-      const url = getUrl(path, target);
+      const url = getUrl(path, ctx.state.target);
       const body = getBody(_body, method);
 
       debug('=>', method, url, headers, body);
@@ -74,13 +75,15 @@ export class Proxy extends Onion {
   }
 
   public async request(input: RequestInput): Promise<RequestOutput> {
-    return this.execute(input as any);
+    return this.execute(input);
   }
 
   //
   private setup() {
     // 1.request time => requestStartTime (before) and requestTime(after)
     this.use(this.useRequestTime());
+    // 1.1 caculate target
+    this.use(this.useFinalTarget());
     // 2.access log => 
     this.use(this.useRecordAccess());
     // 3.count request => requestCount
@@ -116,9 +119,20 @@ export class Proxy extends Onion {
     };
   }
 
+  private useFinalTarget(): Middleware<Context> {
+    return async (ctx, next) => {
+      const { target: _target, enableDynamicTarget } = this.config!;
+      const { target: _dynamicTarget } = ctx.input;
+
+      (ctx.state as any).target = getTarget(_target, _dynamicTarget, enableDynamicTarget);
+
+      await next!();
+    };
+  }
+
   private useRecordAccess(): Middleware<Context> {
     return async (ctx, next) => {
-      const { target } = this.options;
+      const { target } = ctx.state;
       const { method, path } = ctx.input;
 
       this.logger.log(`=> ${method} ${path} (target: ${target})`);
@@ -151,7 +165,7 @@ export class Proxy extends Onion {
       
       if (!cache.get(tickKey)) {
         this.logger.log(
-          'Gateway:', this.options.target || 'None',
+          'Gateway:', this.config.target || 'None',
           'Count:', `${requestCount.all}/${requestCount.fail}`);
     
         cache.set(tickKey, true, { maxAge: 10000 });
@@ -168,7 +182,7 @@ export class Proxy extends Onion {
       // init
       (ctx.state as any).requestCache = memoryCache;
 
-      const { cache } = this.options;
+      const { cache } = this.config;
       const { method, path } = ctx.input;
       const { requestStartTime } = ctx.state;
 
@@ -226,7 +240,7 @@ export class Proxy extends Onion {
         ctx.state.requestCount.count('fail');
 
         // 避免缓存击穿
-        const { cache } = this.options;
+        const { cache } = this.config;
         if (cache) {
           requestCache.set(ctx.state.md5Key, error, { maxAge: (cache.fatal) * 1000 });
         }
@@ -276,7 +290,7 @@ export class Proxy extends Onion {
         ctx.state.requestCount.count('fail');
 
         // accesslog
-        // const { target } = this.options;
+        // const { target } = ctx.state;
         // const requestTime = +new Date() - ctx.state.requestStartTime;
         // this.logger.log(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
       }

@@ -4,11 +4,17 @@ import {
   RequestOutput as ProxyOutput,
 } from '@zoproxy/core';
 
-export interface ProxyClientConfig extends Omit<Config, 'target'> {
-  registry: string;
+export interface ProxyServerConfig extends Config {
+  // client <=> server
   method: string; // 'POST';
   endpoint: string;
+
+  // server => origin data server
   headers?: Headers;
+  // target: string;
+
+  // handshake
+  onHandShake: HandShakeMethod;
 }
 
 export interface RequestInput {
@@ -18,18 +24,18 @@ export interface RequestInput {
   body: any;
 }
 
-export interface RequestOptions extends ClientProxyAttributes {
+export interface RequestOptionsFromServer extends ProxyAttributesFromClient {
   headers?: Headers;
 }
 
-export interface RequestOutput extends ProxyOutput {
+export interface RequestOutputFromTarget extends ProxyOutput {
 
 }
 
 /**
  * Client Request Proxy Body
  */
-export interface ClientProxyRequest {
+export interface ProxyRequestFromClient {
   method: string;
   path: string;
   headers: Headers;
@@ -40,7 +46,7 @@ export interface ClientProxyRequest {
  * Client Request Proxy Attributes
  *  which usual Static
  */
-export interface ClientProxyAttributes {
+export interface ProxyAttributesFromClient {
   // safe
   handshake: HandShake;
 
@@ -61,19 +67,30 @@ export interface HandShake {
   user?: any;
 }
 
+/**
+ * ProxyServer Hand Shake Method
+ *  using for:
+ *    1 authentication
+ *    2 permission
+ *    3 rate limit
+ * 
+ *  how to:
+ *    if not validate, throw error with status and message
+ */
+export type HandShakeMethod = (handshake?: HandShake) => Promise<void>;
 
-export interface ClientRequestBody {
+export interface RequestBodyFromClient {
   /**
    * Proxy Attributes, Static Data
    * @Notice DONOT SET DYNAMIC DATA HERE
    */
-  attributes: ClientProxyAttributes;
+  attributes: ProxyAttributesFromClient;
 
   /**
    * Proxy Request Value
    * @Notice ONLY SET PROXY DATA, DONOT SET NO PROXY REQUEST DATA HERE
    */
-  values: ClientProxyRequest;
+  values: ProxyRequestFromClient;
 
   /**
    * timestamps

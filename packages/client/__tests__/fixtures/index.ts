@@ -5,7 +5,7 @@ import { ProxyClient } from '../../src';
 
 declare module '@koex/core' {
   export interface Context {
-    proxy: ProxyClient;
+    proxyClient: ProxyClient;
   }
 }
 
@@ -15,13 +15,13 @@ app.use(body());
 
 app.use((() => {
   const proxy = new ProxyClient({
-    registry: 'http://127.0.0.1:8080',
+    registry: 'http://127.0.0.1:8090',
     method: 'POST',
     endpoint: '/proxy',
   });
 
   return async (ctx, next) => {
-    ctx.proxy = proxy;
+    ctx.proxyClient = proxy;
   
     await next();
   };
@@ -32,7 +32,7 @@ app.use(async (ctx, next) => {
     return next();
   }
 
-  const response = await ctx.proxy.request({
+  const response = await ctx.proxyClient.request({
     method: ctx.method,
     path: ctx.path.replace('/api', ''),
     headers: ctx.headers,
@@ -52,7 +52,7 @@ app.use(async (ctx, next) => {
 });
 
 app.get('/github/:username', async (ctx) => {
-  const response = await ctx.proxy.request({
+  const response = await ctx.proxyClient.request({
     method: ctx.method,
     path: `/users/${ctx.params.username}`,
     headers: ctx.headers,
@@ -65,14 +65,14 @@ app.get('/github/:username', async (ctx) => {
       timestamps: +new Date(),
     },
   });
-
+  
   ctx.set(response.headers.raw() as any);
   ctx.status = response.status;
   ctx.body = response.body;
 });
 
 app.get('/md5/:value', async (ctx) => {
-  const response = await ctx.proxy.request({
+  const response = await ctx.proxyClient.request({
     method: ctx.method,
     path: `/md5/${ctx.params.value}`,
     headers: ctx.headers,
@@ -92,7 +92,7 @@ app.get('/md5/:value', async (ctx) => {
 });
 
 app.get('/zcorky/(.*)', async (ctx) => {
-  const response = await ctx.proxy.request({
+  const response = await ctx.proxyClient.request({
     method: ctx.method,
     path: ctx.path.replace('/zcorky', ''),
     headers: ctx.headers,
@@ -142,6 +142,6 @@ app.get('/', async (ctx) => {
   };
 });
 
-(app as any).listen(8082, '0.0.0.0', () => {
-  console.log('server start at: http://127.0.0.1:8082');
+(app as any).listen(8091, '0.0.0.0', () => {
+  console.log('server start at: http://127.0.0.1:8091');
 });

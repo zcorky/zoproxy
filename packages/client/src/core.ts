@@ -2,9 +2,7 @@ import * as assert from 'assert';
 import { Proxy } from '@zoproxy/core';
 import { Response } from 'node-fetch';
 
-import { getLogger } from '@zodash/logger';
-
-import { Config, RequestInput, RequestOptions, RequestOutput, ClientRequestBody } from './interface';
+import { ProxyClientConfig, RequestInput, RequestOptions, RequestOutput, ClientRequestBody } from './interface';
 
 const debug = require('debug')('datahub.client');
 
@@ -12,7 +10,7 @@ export class ProxyClient {
   private core = new Proxy({ ...this.config, target: this.config.registry });
   // private logger = getLogger('datahub.client');
 
-  constructor(public readonly config: Config) {
+  constructor(public readonly config: ProxyClientConfig) {
 
   }
 

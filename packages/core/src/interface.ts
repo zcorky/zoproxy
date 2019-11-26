@@ -20,6 +20,9 @@ export interface RequestInput {
   path: Path;
   headers: Headers;
   body?: Body;
+
+  // only works when enableDynamicTarget
+  target?: string;
 }
 
 export interface RequestOutput extends Response {
@@ -28,8 +31,12 @@ export interface RequestOutput extends Response {
 
 export type Request = (input: RequestInput) => RequestOutput;
 
-export interface RequestOptions {
+export interface Config {
+  /**
+   * target server
+   */
   target: string;
+
   cache?: {
     // OK Request, s
     ok: number;
@@ -39,5 +46,8 @@ export interface RequestOptions {
 
     // Broken Request
     fatal: number;
-  }
+  };
+
+  // dynamic target
+  enableDynamicTarget?: boolean;
 }
