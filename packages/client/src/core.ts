@@ -67,7 +67,7 @@ export class ProxyClient {
     const headers = this.getHeaders();
     const body = JSON.stringify(this.getBody(input, options));
 
-    const response = await this.core.request({ method, path, headers, body });
+    const { response } = await this.core.request({ method, path, headers, body });
     
     if (response.status >= 400 && response.status < 600) {
       const originBody = await response.json();

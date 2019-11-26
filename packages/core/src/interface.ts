@@ -25,8 +25,9 @@ export interface RequestInput {
   target?: string;
 }
 
-export interface RequestOutput extends Response {
-
+export interface RequestOutput {
+  response: Response;
+  requestTime: number;
 }
 
 export type Request = (input: RequestInput) => RequestOutput;

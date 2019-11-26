@@ -63,7 +63,7 @@ export class ProxyServer {
     const headers = this.getHeaders(input, options);
     const body = JSON.stringify(this.getBody(input));
 
-    const response = await this.core.request({
+    const { response } = await this.core.request({
       target,
       method, path, headers, body,
     });

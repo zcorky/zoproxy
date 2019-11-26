@@ -20,8 +20,8 @@ import { getBody } from './utils/get-body';
 const debug = require('debug')('datahub');
 
 declare module '@zodash/onion' {
-  export interface Input extends RequestInput {
-
+  export interface Input  {
+    request: RequestInput;
   }
 
   export interface Output extends RequestOutput {
@@ -53,7 +53,7 @@ export class Proxy extends Onion {
 
   public handle(): Middleware<Context> {
     return async (ctx) => {
-      const { method, path, headers, body: _body } = ctx.input;
+      const { method, path, headers, body: _body } = ctx.input.request;
 
       const url = getUrl(path, ctx.state.target);
       const body = getBody(_body, method);
@@ -70,12 +70,14 @@ export class Proxy extends Onion {
 
       response.headers.set('X-RunTime', ctx.state.requestTime + '');
       
-      ctx.output = response;
+      ctx.output.response = response;
     };
   }
 
   public async request(input: RequestInput): Promise<RequestOutput> {
-    return this.execute(input);
+    return await this
+      .execute({ request: input })
+      // .then(({ response }) => response);
   }
 
   //
@@ -122,7 +124,7 @@ export class Proxy extends Onion {
   private useFinalTarget(): Middleware<Context> {
     return async (ctx, next) => {
       const { target: _target, enableDynamicTarget } = this.config!;
-      const { target: _dynamicTarget } = ctx.input;
+      const { target: _dynamicTarget } = ctx.input.request;
 
       (ctx.state as any).target = getTarget(_target, _dynamicTarget, enableDynamicTarget);
 
@@ -133,13 +135,13 @@ export class Proxy extends Onion {
   private useRecordAccess(): Middleware<Context> {
     return async (ctx, next) => {
       const { target } = ctx.state;
-      const { method, path } = ctx.input;
+      const { method, path } = ctx.input.request;
 
       this.logger.log(`=> ${method} ${path} (target: ${target})`);
 
       await next!();
 
-      const { status } = ctx.output;
+      const { status } = ctx.output.response;
       const requestTime = +new Date() - ctx.state.requestStartTime;
       
       this.logger.log(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
@@ -183,28 +185,28 @@ export class Proxy extends Onion {
       (ctx.state as any).requestCache = memoryCache;
 
       const { cache } = this.config;
-      const { method, path } = ctx.input;
+      const { method, path } = ctx.input.request;
       const { requestStartTime } = ctx.state;
 
       const md5Key = md5(JSON.stringify(ctx.input));
 
       // 命中缓存
       if (cache && (method === 'GET' || method === 'HEAD')) {
-        const cachedResponse = memoryCache.get(md5Key);
+        const cachedRequestOutput = memoryCache.get(md5Key);
   
-        if (cachedResponse) {
+        if (cachedRequestOutput) {
           const requestTime = +new Date() - requestStartTime;
           ctx.state.requestTime = requestTime;
   
-          if (cachedResponse instanceof Error) {
-            this.logger.log(`${method} ${path} ${(cachedResponse as any).status} +${requestTime} (hit cache)`);
+          if (cachedRequestOutput instanceof Error) {
+            this.logger.log(`${method} ${path} ${(cachedRequestOutput as any).status} +${requestTime} (hit cache)`);
   
-            throw cachedResponse;
+            throw cachedRequestOutput;
           }
   
-          this.logger.log(`${method} ${path} ${cachedResponse.status} +${requestTime} (hit cache)`);
+          this.logger.log(`${method} ${path} ${cachedRequestOutput.response.status} +${requestTime} (hit cache)`);
           
-          ctx.output = cachedResponse.clone();
+          ctx.output.response = cachedRequestOutput.response.clone();
           return ;
         }
       }
@@ -214,7 +216,12 @@ export class Proxy extends Onion {
 
       // 成功缓存
       if (cache) {
-        memoryCache.set(md5Key, ctx.output.clone(), { maxAge: (cache.ok || 0) * 1000 }); // @TODO
+        const output = {
+          ...ctx.output,
+          response: ctx.output.response.clone(),
+        };
+        
+        memoryCache.set(md5Key, output, { maxAge: (cache.ok || 0) * 1000 }); // @TODO
       }
     };
   }
@@ -232,7 +239,7 @@ export class Proxy extends Onion {
         error.status = error.status || 500;
         error.message = error.message || `Gateway Error: ${error.message} +${requestTime}`;
         
-        const { method, path } = ctx.input;
+        const { method, path } = ctx.input.request;
         this.logger.log(`${method} ${path} ${error.status} (Gateway Status Error)`);
         this.logger.error(error);
 
@@ -254,8 +261,8 @@ export class Proxy extends Onion {
     return async (ctx, next) => {
       await next!();
 
-      const { method, path } = ctx.input;
-      const response = ctx.output;
+      const { method, path } = ctx.input.request;
+      const response = ctx.output.response;
       const { status: _status, statusText } = response;
 
       if (_status < 200 || _status > 299) {
@@ -284,7 +291,7 @@ export class Proxy extends Onion {
         // @TODO 
         
         _errorResponse.headers.set('Content-Type', 'application/json');
-        ctx.output = _errorResponse;
+        ctx.output.response = _errorResponse;
 
         // count fail
         ctx.state.requestCount.count('fail');
@@ -299,9 +306,9 @@ export class Proxy extends Onion {
 
   private useChangeRequestHeaders(): Middleware<Context> {
     return async (ctx, next) => {
-      const originHeaders = ctx.input.headers;
+      const originHeaders = ctx.input.request.headers;
 
-      ctx.input.headers = omit(originHeaders, [
+      ctx.input.request.headers = omit(originHeaders, [
         'host', 'origin', 'referer', 'accept-encoding',
       ]);
 
@@ -313,7 +320,7 @@ export class Proxy extends Onion {
     return async (ctx, next) => {
       await next!();
 
-      const response = ctx.output;
+      const response = ctx.output.response;
       const requestStartTime = ctx.state.requestStartTime;
       response.headers.set('X-Runtime', `${+new Date() - requestStartTime}`);
       

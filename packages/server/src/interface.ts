@@ -1,8 +1,9 @@
 import {
   Headers,
   Config, 
-  RequestOutput as ProxyOutput,
+  // RequestOutput as ProxyOutput,
 } from '@zoproxy/core';
+import { Response } from 'node-fetch';
 
 export interface ProxyServerConfig extends Config {
   // client <=> server
@@ -28,7 +29,7 @@ export interface RequestOptionsFromServer extends ProxyAttributesFromClient {
   headers?: Headers;
 }
 
-export interface RequestOutputFromTarget extends ProxyOutput {
+export interface RequestOutputFromTarget extends Response {
 
 }
 
