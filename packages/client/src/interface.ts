@@ -1,7 +1,7 @@
 import {
   Headers,
   RequestOptions as ProxyConfig, 
-  RequestOutput,
+  RequestOutput as ProxyOutput,
 } from '@zoproxy/core';
 
 export interface Config extends Omit<ProxyConfig, 'target'> {
@@ -22,7 +22,7 @@ export interface RequestOptions extends ClientProxyAttributes {
   headers?: Headers;
 }
 
-export interface RequestOutput extends RequestOutput {
+export interface RequestOutput extends ProxyOutput {
 
 }
 

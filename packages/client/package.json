@@ -71,15 +71,8 @@
     "url": "https://github.com/zcorky/zodash/issues"
   },
   "dependencies": {
-    "@types/node-fetch": "^2.5.4",
-    "@zcorky/lru": "^1.0.3",
-    "@zodash/crypto": "^0.0.7",
-    "@zodash/logger": "^0.0.5",
-    "@zodash/omit": "^1.0.16",
-    "@zodash/onion": "^0.0.12",
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/core": "^0.0.1",
-    "debug": "^4.1.1",
-    "node-fetch": "^2.6.0"
+    "@zoproxy/core": "^0.0.2",
+    "debug": "^4.1.1"
   }
 }
