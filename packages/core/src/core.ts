@@ -222,6 +222,7 @@ export class Proxy extends Onion {
         this.logger.log(`${method} ${path} ${error.status} (Gateway Status Error)`);
         this.logger.error(error);
 
+        // count fail
         ctx.state.requestCount.count('fail');
 
         // 避免缓存击穿
@@ -245,9 +246,23 @@ export class Proxy extends Onion {
 
       if (_status < 200 || _status > 299) {
         const status = _status;
-        const message = await response.text();
+        let message: string | object;
 
-        const body = JSON.stringify({ method, path, status, message, timestamps: +new Date() });
+        // @TODO
+        if (response.headers.get('Content-Type').includes('json')) {
+          message = await response.json();
+        } else {
+          message = await response.text();
+        }
+
+        this.logger.debug('message: ', message);
+
+        // @TODO
+        const body = JSON.stringify({
+          method, path, status,
+          message,
+          timestamps: +new Date(),
+        });
         const _errorResponse = new Response(body, {
           status, statusText,
           headers: response.headers,
@@ -259,10 +274,13 @@ export class Proxy extends Onion {
         _errorResponse.headers.set('Content-Type', 'application/json');
         ctx.output = _errorResponse;
 
+        // count fail
+        ctx.state.requestCount.count('fail');
+
         // accesslog
-        const { target } = this.options;
-        const requestTime = +new Date() - ctx.state.requestStartTime;
-        this.logger.log(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
+        // const { target } = this.options;
+        // const requestTime = +new Date() - ctx.state.requestStartTime;
+        // this.logger.log(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
       }
     };
   }
