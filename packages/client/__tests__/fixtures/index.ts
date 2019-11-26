@@ -47,6 +47,7 @@ app.use(async (ctx, next) => {
   });
 
   ctx.set(response.headers.raw() as any);
+  ctx.status = response.status;
   ctx.body = response.body;
 });
 
@@ -66,6 +67,7 @@ app.get('/github/:username', async (ctx) => {
   });
 
   ctx.set(response.headers.raw() as any);
+  ctx.status = response.status;
   ctx.body = response.body;
 });
 
@@ -85,6 +87,7 @@ app.get('/md5/:value', async (ctx) => {
   });
 
   ctx.set(response.headers.raw() as any);
+  ctx.status = response.status;
   ctx.body = response.body;
 });
 
@@ -104,6 +107,7 @@ app.get('/zcorky/(.*)', async (ctx) => {
   });
 
   ctx.set(response.headers.raw() as any);
+  ctx.status = response.status;
   ctx.body = response.body;
 });
 
