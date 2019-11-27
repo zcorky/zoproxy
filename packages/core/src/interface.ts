@@ -53,5 +53,5 @@ export interface Config {
   enableDynamicTarget?: boolean;
 }
 
-/* Export node-fetch Response */
-export type Response = Response;
+// /* Export node-fetch Response */
+// export type Response = Response;

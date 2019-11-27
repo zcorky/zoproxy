@@ -1,4 +1,3 @@
-import * as stream from 'stream';
 import { Response } from 'node-fetch';
 import { Onion, Input, Middleware, Context } from '@zodash/onion';
 import { getLogger } from '@zodash/logger';
@@ -41,6 +40,13 @@ declare module '@zodash/onion' {
     };
   }
 }
+
+/**
+ * Export Response
+ */
+export {
+  Response,
+};
 
 export class Proxy extends Onion {
   private logger = getLogger('datahub');;
