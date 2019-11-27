@@ -21,7 +21,7 @@ export interface RequestInput {
 
 export interface RequestOptions extends ClientProxyAttributes {
   // extends headers between proxy-client <-> proxy-server
-  severHeaders?: Headers;
+  serverHeaders?: Headers;
 
   // extends headers between proxy-client <-> real data server
   dataHeaders?: Headers;
