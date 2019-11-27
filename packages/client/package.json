@@ -1,6 +1,6 @@
 {
   "name": "@zoproxy/client",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "A Simple Proxy Framework Core",
   "keywords": [
     "proxy",
@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/core": "^0.0.5",
+    "@zoproxy/core": "^0.0.6",
     "debug": "^4.1.1"
   }
 }
