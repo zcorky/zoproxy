@@ -63,10 +63,13 @@ export class ProxyServer {
     const headers = this.getHeaders(input, options);
     const body = JSON.stringify(this.getBody(input));
 
+    debug(`${method} ${path} ${headers} ${body} - ${target}`)
     const { response } = await this.core.request({
       target,
       method, path, headers, body,
     });
+
+    debug(`${method} ${path} ${headers} ${body} - ${target} +${response.status}`)
     
     if (response.status >= 400 && response.status < 600) {
       const originBody = await response.json();
