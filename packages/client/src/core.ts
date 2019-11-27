@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import { Proxy, Response } from '@zoproxy/core';
+import { getLogger } from '@zodash/logger';
 
 import { ProxyClientConfig, RequestInput, RequestOptions, RequestOutput, ClientRequestBody } from './interface';
 
@@ -7,7 +8,7 @@ const debug = require('debug')('datahub.client');
 
 export class ProxyClient {
   private core = new Proxy({ ...this.config, target: this.config.registry });
-  // private logger = getLogger('datahub.client');
+  private logger = getLogger('datahub.client');
 
   constructor(public readonly config: ProxyClientConfig) {
 
@@ -66,7 +67,11 @@ export class ProxyClient {
     const headers = this.getHeaders();
     const body = JSON.stringify(this.getBody(input, options));
 
-    const { response } = await this.core.request({ method, path, headers, body });
+    this.logger.info('=>', input.method, input.path);
+    const {
+      response,
+      requestTime,
+    } = await this.core.request({ method, path, headers, body });
     
     if (response.status >= 400 && response.status < 600) {
       const originBody = await response.json();
@@ -81,9 +86,11 @@ export class ProxyClient {
         headers: response.headers,
       });
 
+      this.logger.info('=>', input.method, input.path, response.status, `+${requestTime}ms`);
       return _errorResponse;
     }
 
+    this.logger.info('=>', input.method, input.path, response.status, `+${requestTime}ms`);
     return response;
   }
 }

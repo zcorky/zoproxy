@@ -71,6 +71,7 @@
     "url": "https://github.com/zcorky/zodash/issues"
   },
   "dependencies": {
+    "@zodash/logger": "^0.0.5",
     "@zodash/uuid": "^0.0.2",
     "@zoproxy/core": "^0.0.7",
     "debug": "^4.1.1"
