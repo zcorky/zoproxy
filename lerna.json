@@ -9,7 +9,9 @@
       "registry": "https://registry.npmjs.org/",
       "ignoreChanges": [
         "*.lock",
-        "CHANGELOG.md"
+        "package-lock.json",
+        "CHANGELOG.md",
+        ".npmrc"
       ],
       "allowBranch": [
         "master"
