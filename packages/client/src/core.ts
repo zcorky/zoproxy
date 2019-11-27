@@ -40,9 +40,10 @@ export class ProxyClient {
   }
 
   // headers to registry
-  private getHeaders() {
+  private getHeaders(options: RequestOptions) {
     return {
       ...this.config.headers,
+      ...options.serverHeaders,
       'User-Agent': 'ProxyClient/v0.0.0',
       'Content-Type': 'application/json',
     };
@@ -63,7 +64,7 @@ export class ProxyClient {
         // browser request headers
         ...body.headers,
         // request method option headers
-        ...options.headers,
+        ...options.dataHeaders,
       },
     };
 
@@ -77,7 +78,7 @@ export class ProxyClient {
 
     const method = this.getMethod();
     const path = this.getPath();
-    const headers = this.getHeaders();
+    const headers = this.getHeaders(options);
     const body = JSON.stringify(this.getBody(input, options));
 
     this.logger.info('=>', input.method, input.path, '-', target);
