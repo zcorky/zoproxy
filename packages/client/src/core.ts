@@ -4,14 +4,25 @@ import { getLogger } from '@zodash/logger';
 
 import { ProxyClientConfig, RequestInput, RequestOptions, RequestOutput, ClientRequestBody } from './interface';
 
-const debug = require('debug')('datahub.client');
+const debug = require('debug')('@zoproxy/client');
 
 export class ProxyClient {
   private core = new Proxy({ ...this.config, target: this.config.registry });
-  private logger = getLogger('datahub.client');
+  private logger = getLogger('zoproxy.client');
 
   constructor(public readonly config: ProxyClientConfig) {
 
+  }
+
+  private getTarget(requestOptions: RequestOptions) {
+    const { registry, enableDynamicTarget } = this.config;
+    const { target: _dynamicTarget } = requestOptions;
+
+    if (enableDynamicTarget && _dynamicTarget) {
+      return _dynamicTarget;
+    }
+
+    return registry;
   }
 
   // path to registry
@@ -62,12 +73,14 @@ export class ProxyClient {
   }
 
   public async request(input: RequestInput, options: RequestOptions): Promise<RequestOutput> {
+    const target = this.getTarget(options);
+
     const method = this.getMethod();
     const path = this.getPath();
     const headers = this.getHeaders();
     const body = JSON.stringify(this.getBody(input, options));
 
-    this.logger.info('=>', input.method, input.path);
+    this.logger.info('=>', input.method, input.path, '-', target);
 
     const {
       response,

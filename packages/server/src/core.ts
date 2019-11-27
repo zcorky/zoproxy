@@ -9,11 +9,11 @@ import {
   RequestOutputFromTarget,
 } from './interface';
 
-const debug = require('debug')('datahub.server');
+const debug = require('debug')('@zoproxy/server');
 
 export class ProxyServer {
   private core = new Proxy(this.config);
-  private logger = getLogger('datahub.server');
+  private logger = getLogger('zoproxy.server');
 
   constructor(public readonly config: ProxyServerConfig) {}
 
@@ -76,7 +76,7 @@ export class ProxyServer {
       method, path, headers, body,
     });
     
-    this.logger.info('<=', method, path, response.status, `+${requestTime}ms`, '-', target);
+    this.logger.info('<=', method, path, response.status, `+${requestTime}ms`);
 
     if (response.status >= 400 && response.status < 600) {
       const originBody = await response.json();
