@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/core": "^0.0.4",
+    "@zoproxy/core": "^0.0.5",
     "debug": "^4.1.1"
   }
 }

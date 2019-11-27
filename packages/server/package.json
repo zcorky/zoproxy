@@ -73,7 +73,7 @@
   "dependencies": {
     "@zcorky/query-string": "^1.0.2",
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/core": "^0.0.3",
+    "@zoproxy/core": "^0.0.5",
     "debug": "^4.1.1"
   }
 }
