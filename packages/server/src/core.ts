@@ -1,5 +1,6 @@
 import { Proxy, Response } from '@zoproxy/core';
 import * as qs from '@zcorky/query-string';
+import { getLogger } from '@zodash/logger';
 
 import {
   ProxyServerConfig,
@@ -8,17 +9,22 @@ import {
   RequestOutputFromTarget,
 } from './interface';
 
-const debug = require('debug')('datahub.client');
+const debug = require('debug')('datahub.server');
 
 export class ProxyServer {
   private core = new Proxy(this.config);
-  // private logger = getLogger('datahub.client');
+  private logger = getLogger('datahub.server');
 
   constructor(public readonly config: ProxyServerConfig) {}
 
   // target server, from client
   private getTarget(body: RequestBodyFromClient) {
-    return body.attributes.target;
+    const { enableDynamicTarget } = this.config;
+    if (enableDynamicTarget && body.attributes.target) {
+      return body.attributes.target;
+    }
+
+    return this.config.target;
   }
 
   // path to target server, from client
@@ -57,19 +63,21 @@ export class ProxyServer {
 
   public async request(input: RequestBodyFromClient, options?: RequestOptionsFromServer): Promise<RequestOutputFromTarget> {
     const target = this.getTarget(input);
+
     const method = this.getMethod(input);
     const path = this.getPath(input);
     const headers = this.getHeaders(input, options);
     const body = JSON.stringify(this.getBody(input));
 
-    debug(`${method} ${path} ${headers} ${body} - ${target}`)
-    const { response } = await this.core.request({
+    this.logger.info('=>', method, path, '-', target);
+    
+    const { response, requestTime } = await this.core.request({
       target,
       method, path, headers, body,
     });
-
-    debug(`${method} ${path} ${headers} ${body} - ${target} +${response.status}`)
     
+    this.logger.info('<=', method, path, response.status, `+${requestTime}ms`, '-', target);
+
     if (response.status >= 400 && response.status < 600) {
       const originBody = await response.json();
       const _body = JSON.stringify(originBody.message);
@@ -82,7 +90,7 @@ export class ProxyServer {
 
       return _errorResponse;
     }
-
+    
     return response;
   }
 }
