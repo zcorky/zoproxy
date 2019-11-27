@@ -1,5 +1,4 @@
-import { Proxy } from '@zoproxy/core';
-import { Response } from 'node-fetch';
+import { Proxy, Response } from '@zoproxy/core';
 import * as qs from '@zcorky/query-string';
 
 import {

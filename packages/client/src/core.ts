@@ -1,6 +1,5 @@
 import * as assert from 'assert';
-import { Proxy } from '@zoproxy/core';
-import { Response } from 'node-fetch';
+import { Proxy, Response } from '@zoproxy/core';
 
 import { ProxyClientConfig, RequestInput, RequestOptions, RequestOutput, ClientRequestBody } from './interface';
 

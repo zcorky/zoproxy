@@ -2,8 +2,8 @@ import {
   Headers,
   Config, 
   // RequestOutput as ProxyOutput,
+  Response,
 } from '@zoproxy/core';
-import { Response } from 'node-fetch';
 
 export interface ProxyClientConfig extends Omit<Config, 'target'> {
   registry: string;
