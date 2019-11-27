@@ -153,6 +153,7 @@ export class Proxy extends Onion {
       const { method, path } = ctx.input.request;
 
       debug(`=> ${method} ${path} (target: ${target})`);
+      debug(ctx.input);
 
       await next!();
 
@@ -160,6 +161,7 @@ export class Proxy extends Onion {
       const requestTime = +new Date() - ctx.state.requestStartTime;
       
       debug(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
+      debug(ctx.output);
     };
   }
 
