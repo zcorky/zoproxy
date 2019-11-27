@@ -86,6 +86,8 @@ export class Proxy extends Onion {
 
   //
   private setup() {
+    // 0.copy context state to output
+    this.use(this.useCopyStateToOutput());
     // 1.request time => requestStartTime (before) and requestTime(after)
     this.use(this.useRequestTime());
     // 1.1 caculate target
@@ -104,6 +106,15 @@ export class Proxy extends Onion {
     this.use(this.useChangeRequestHeaders());
     // 8.change response header
     this.use(this.useChangeResponseHeaders());
+  }
+
+  private useCopyStateToOutput(): Middleware<Context> {
+    return async (ctx, next) => {
+      await next();
+
+      // requestTime
+      ctx.output.requestTime = ctx.state.requestTime;
+    };
   }
 
   private useRequestTime(): Middleware<Context> {
