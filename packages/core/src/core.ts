@@ -285,7 +285,8 @@ export class Proxy extends Onion {
         let message: string | object;
 
         // @TODO
-        if (response.headers.get('Content-Type').includes('json')) {
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('json')) {
           message = await response.json();
         } else {
           message = await response.text();
