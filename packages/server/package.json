@@ -1,6 +1,6 @@
 {
   "name": "@zoproxy/server",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A Simple Proxy Framework Core",
   "keywords": [
     "proxy",
@@ -73,7 +73,7 @@
   "dependencies": {
     "@zcorky/query-string": "^1.0.2",
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/core": "^0.0.7",
+    "@zoproxy/core": "^0.0.8",
     "debug": "^4.1.1"
   }
 }
