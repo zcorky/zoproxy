@@ -1,5 +1,6 @@
 import { Proxy, Response } from '@zoproxy/core';
 import * as qs from '@zcorky/query-string';
+import { Middleware, Context } from '@zodash/onion';
 import { getLogger } from '@zodash/logger';
 
 import {
@@ -11,11 +12,18 @@ import {
 
 const debug = require('debug')('@zoproxy/server');
 
-export class ProxyServer {
-  private core = new Proxy(this.config);
-  private logger = getLogger('zoproxy.server');
+const HANDSHAKE = Symbol('handshake');
 
-  constructor(public readonly config: ProxyServerConfig) {}
+export class ProxyServer {
+  private core: Proxy;
+  private logger = getLogger('zoproxy.server');
+  private handshake: any;
+
+  constructor(public readonly config: ProxyServerConfig) {
+    this.core = new Proxy(this.config);
+
+    this.core.use(this.useHandShake());
+  }
 
   // target server, from client
   private getTarget(body: RequestBodyFromClient) {
@@ -49,7 +57,11 @@ export class ProxyServer {
 
   // body to target server, from client
   private getBody(body: RequestBodyFromClient): any {
+    const { handshake } = body.attributes;
     const { headers, body: _body } = body.values;
+
+    // set handshake
+    this.setHandShake(handshake);
 
     if (headers['Content-Type'] && headers['Content-Type'].includes('json')) {
       return JSON.stringify(_body);
@@ -93,5 +105,22 @@ export class ProxyServer {
     }
     
     return response;
+  }
+
+  private useHandShake = () => {
+    return async (ctx, next) => {
+      // waitingHandleShake
+      await this.config.onHandShake(this.getHandShake())
+
+      await next!();
+    };
+  }
+
+  private setHandShake(handshake: any) {
+    this[HANDSHAKE] = handshake
+  }
+
+  private getHandShake() {
+    return this[HANDSHAKE];
   }
 }

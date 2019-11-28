@@ -20,16 +20,20 @@ app.use((() => {
     endpoint: '/proxy',
     enableDynamicTarget: true,
     async onHandShake(handshake) {
-      console.log('handshake: ', handshake);
-      const validated = handshake && handshake.appId === 'app-id' && handshake.appToken === 'app-token';
+      const error = new Error('Forbidden') as any;
+      error.status = 403;
+      throw error;
+
+      // console.log('handshake: ', handshake);
+      // const validated = handshake && handshake.appId === 'app-id' && handshake.appToken === 'app-token';
   
-      if (!validated) {
-          const error = new Error('Forbidden') as any;
-          error.status = 403;
-          throw error;
-      }
+      // if (!validated) {
+      //     const error = new Error('Forbidden') as any;
+      //     error.status = 403;
+      //     throw error;
+      // }
   
-      console.log('handshake successfully');
+      // console.log('handshake successfully');
     },
   });
 
