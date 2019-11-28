@@ -75,7 +75,7 @@
     "@zodash/logger": "^0.0.5",
     "@zodash/uuid": "^0.0.2",
     "@zoproxy/client": "^0.0.14",
-    "@zoproxy/server": "^0.0.14",
+    "@zoproxy/server": "^0.0.15",
     "debug": "^4.1.1"
   }
 }

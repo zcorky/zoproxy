@@ -23,6 +23,9 @@ app.use(createProxyServer({
     }
 
     console.log('handshake successfully');
+    // const error = new Error('Forbidden') as any;
+    //     error.status = 403;
+    //     throw error;
   },
 
   enableDynamicTarget: true,
@@ -33,7 +36,7 @@ app.use(async (ctx, next) => {
     return next();
   }
 
-  const response = await ctx.proxyClient.request(ctx.request.body);
+  const response = await ctx.proxyServer.request(ctx.request.body);
 
   ctx.set(response.headers.raw() as any);
   ctx.status = response.status;
@@ -41,19 +44,7 @@ app.use(async (ctx, next) => {
 });
 
 app.get('/github/:username', async (ctx) => {
-  const response = await ctx.proxyClient.request({
-    method: ctx.method,
-    path: `/users/${ctx.params.username}`,
-    headers: ctx.headers,
-    body: ctx.request.body,
-  }, {
-    target: 'https://api.github.com',
-    handshake: {
-      appId: 'app-id',
-      appToken: 'app-token',
-      timestamps: +new Date(),
-    },
-  });
+  const response = await ctx.proxyServer.request(ctx.request.body);
 
   ctx.set(response.headers.raw() as any);
   ctx.status = response.status;

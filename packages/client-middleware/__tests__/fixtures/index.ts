@@ -50,7 +50,7 @@ app.get('/github/:username', async (ctx) => {
   }, {
     target: 'https://api.github.com',
     handshake: {
-      appId: 'app-id',
+      appId: 'app-id does exist, handshake error',
       appToken: 'app-token',
       timestamps: +new Date(),
     },
