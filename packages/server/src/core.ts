@@ -91,18 +91,18 @@ export class ProxyServer {
     
     this.logger.info('<=', method, path, response.status, `+${requestTime}ms`);
 
-    if (response.status >= 400 && response.status < 600) {
-      const originBody = await response.json();
-      const _body = JSON.stringify(originBody.message);
+    // if (response.status >= 400 && response.status < 600) {
+    //   const originBody = await response.json();
+    //   const _body = JSON.stringify(originBody.message);
 
-      const _errorResponse = new Response(_body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
+    //   const _errorResponse = new Response(_body, {
+    //     status: response.status,
+    //     statusText: response.statusText,
+    //     headers: response.headers,
+    //   });
 
-      return _errorResponse;
-    }
+    //   return _errorResponse;
+    // }
     
     return response;
   }

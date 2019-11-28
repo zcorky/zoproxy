@@ -43,6 +43,7 @@ export function createProxyServer(options: Options): Middleware<Context> {
     const response = await proxy.request(clientReqestBody);
   
     ctx.set(response.headers.raw() as any);
+    ctx.status = response.status;
     ctx.body = response.body;
   }
 }

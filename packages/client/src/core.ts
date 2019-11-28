@@ -98,21 +98,21 @@ export class ProxyClient {
 
     this.logger.info('<=', input.method, input.path, response.status, `+${requestTime}ms`);
     
-    if (response.status >= 400 && response.status < 600) {
-      const originBody = await response.json();
+    // if (response.status >= 400 && response.status < 600) {
+    //   const originBody = await response.json();
       
-      // the real method and path
-      const { method, path } = input;
-      const _body = JSON.stringify({ ...originBody, method, path });
+    //   // the real method and path
+    //   const { method, path } = input;
+    //   const _body = JSON.stringify(originBody); // JSON.stringify({ ...originBody, method, path });
 
-      const _errorResponse = new Response(_body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
+    //   const _errorResponse = new Response(_body, {
+    //     status: response.status,
+    //     statusText: response.statusText,
+    //     headers: response.headers,
+    //   });
 
-      return _errorResponse;
-    }
+    //   return _errorResponse;
+    // }
 
     return response;
   }

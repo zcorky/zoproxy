@@ -33,43 +33,53 @@ app.use(async (ctx, next) => {
     return next();
   }
 
-  const response = await ctx.proxyClient.request({
-    method: ctx.method,
-    path: ctx.path.replace('/api', ''),
-    headers: ctx.headers,
-    body: ctx.request.body,
-  }, {
-    // target: 'https://api.github.com',
-    handshake: {
-      appId: 'app-id',
-      appToken: 'app-token',
-      timestamps: +new Date(),
-    },
-  });
-
-  ctx.set(response.headers.raw() as any);
-  ctx.status = response.status;
-  ctx.body = response.body;
+  try {
+    const response = await ctx.proxyClient.request({
+      method: ctx.method,
+      path: ctx.path.replace('/api', ''),
+      headers: ctx.headers,
+      body: ctx.request.body,
+    }, {
+      // target: 'https://api.github.com',
+      handshake: {
+        appId: 'app-id',
+        appToken: 'app-token',
+        timestamps: +new Date(),
+      },
+    });
+  
+    ctx.set(response.headers.raw() as any);
+    ctx.status = response.status;
+    ctx.body = response.body;
+  } catch (error) {
+    console.log(error);
+    ctx.body = error;
+  }
 });
 
 app.get('/github/:username', async (ctx) => {
-  const response = await ctx.proxyClient.request({
-    method: ctx.method,
-    path: `/users/${ctx.params.username}`,
-    headers: ctx.headers,
-    body: ctx.request.body,
-  }, {
-    target: 'https://api.github.com',
-    handshake: {
-      appId: 'app-id',
-      appToken: 'app-token',
-      timestamps: +new Date(),
-    },
-  });
-  
-  ctx.set(response.headers.raw() as any);
-  ctx.status = response.status;
-  ctx.body = response.body;
+  try {
+    const response = await ctx.proxyClient.request({
+      method: ctx.method,
+      path: `/users/${ctx.params.username}`,
+      headers: ctx.headers,
+      body: ctx.request.body,
+    }, {
+      target: 'https://api.github.com',
+      handshake: {
+        appId: 'app-id',
+        appToken: 'app-token',
+        timestamps: +new Date(),
+      },
+    });
+    
+    ctx.set(response.headers.raw() as any);
+    ctx.status = response.status;
+    ctx.body = response.body; // response.body;
+  } catch (error) {
+    console.log(error);
+    ctx.body = error;
+  }
 });
 
 app.get('/md5/:value', async (ctx) => {

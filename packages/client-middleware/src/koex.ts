@@ -62,6 +62,7 @@ export function createProxyClient(options: Options): Middleware<Context> {
     });
   
     ctx.set(response.headers.raw() as any);
+    ctx.status = response.status;
     ctx.body = response.body;
   }
 }
