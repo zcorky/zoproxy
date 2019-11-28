@@ -74,7 +74,7 @@
     "@koex/core": "^0.0.24",
     "@zodash/logger": "^0.0.5",
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/client": "^0.0.10",
+    "@zoproxy/client": "^0.0.12",
     "debug": "^4.1.1"
   }
 }
