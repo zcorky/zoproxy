@@ -62,7 +62,7 @@ export class Proxy extends Onion {
       const url = getUrl(path, ctx.state.target);
       const body = getBody(_body, method);
 
-      // debug('=>', method, url, headers, body);
+      // debug('=>', method, url);
       
       const response = await request(url, {
         method,
@@ -342,6 +342,9 @@ export class Proxy extends Onion {
       const requestStartTime = ctx.state.requestStartTime;
       response.headers.set('X-Runtime', `${+new Date() - requestStartTime}`);
       
+      // advoiding HPE_UNEXPECTED_CONTENT_LENGTH
+      // stackoverflow: https://stackoverflow.com/questions/35525715/http-get-parse-error-code-hpe-unexpected-content-length
+      response.headers.delete('transfer-encoding');
       // avoiding Zlib.zlibOnError
       response.headers.delete('content-encoding');
     };
