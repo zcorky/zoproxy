@@ -278,47 +278,52 @@ export class Proxy extends Onion {
     return async (ctx, next) => {
       await next!();
 
-      const { method, path } = ctx.input.request;
-      const response = ctx.output.response;
-      const { status: _status, statusText } = response;
+      // const { method, path } = ctx.input.request;
+      // const response = ctx.output.response;
+      // const { status: _status, statusText } = response;
 
-      if (_status < 200 || _status > 299) {
-        const status = _status;
-        let message: string | object;
+      // if (_status < 200 || _status > 299) {
+      //   // count fail
+      //   ctx.state.requestCount.count('fail');
 
-        // @TODO
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('json')) {
-          message = await response.json();
-        } else {
-          message = await response.text();
-        }
+      //   const status = _status;
+      //   let message: string | object;
 
-        // @TODO
-        const body = JSON.stringify({
-          method, path, status,
-          message,
-          timestamps: +new Date(),
-        });
-        const _errorResponse = new Response(body, {
-          status, statusText,
-          headers: response.headers,
-        });
+      //   // @TODO
+      //   const contentType = response.headers.get('Content-Type');
+      //   if (contentType && contentType.includes('json')) {
+      //     // message = await response.json();
+      //     ctx.output.response = response.clone();
+      //     return ;
+      //   } else {
+      //     message = await response.text();
+      //   }
 
-        // using new response;
-        // @TODO 
+      //   // @TODO
+      //   const body = JSON.stringify({
+      //     method, path, status,
+      //     message,
+      //     timestamps: +new Date(),
+      //   });
+
+      //   console.log('body: ', body);
         
-        _errorResponse.headers.set('Content-Type', 'application/json');
-        ctx.output.response = _errorResponse;
+      //   const _errorResponse = new Response(body, {
+      //     status, statusText,
+      //     headers: response.headers,
+      //   });
 
-        // count fail
-        ctx.state.requestCount.count('fail');
+      //   // using new response;
+      //   // @TODO 
+        
+      //   _errorResponse.headers.set('Content-Type', 'application/json');
+      //   ctx.output.response = _errorResponse;
 
-        // accesslog
-        // const { target } = ctx.state;
-        // const requestTime = +new Date() - ctx.state.requestStartTime;
-        // debug(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
-      }
+      //   // accesslog
+      //   // const { target } = ctx.state;
+      //   // const requestTime = +new Date() - ctx.state.requestStartTime;
+      //   // debug(`<= ${method} ${path} ${status} +${requestTime} (target: ${target})`);
+      // }
     };
   }
 
