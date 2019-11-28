@@ -1,6 +1,6 @@
 {
   "name": "@zoproxy/server-middleware",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "A Simple Proxy Framework Core",
   "keywords": [
     "proxy",
