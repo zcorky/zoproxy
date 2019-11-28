@@ -22,7 +22,7 @@ export interface RequestInput {
   body?: Body;
 
   // only works when enableDynamicTarget
-  target?: string;
+  target: string;
 }
 
 export interface RequestOutput {
@@ -35,8 +35,10 @@ export type Request = (input: RequestInput) => RequestOutput;
 export interface Config {
   /**
    * target server
+   *  @removed, should not use target in config
+   *    the target should be dynamic automatically
    */
-  target: string;
+  // target: string;
 
   cache?: {
     // OK Request, s
@@ -48,9 +50,6 @@ export interface Config {
     // Broken Request
     fatal: number;
   };
-
-  // dynamic target
-  enableDynamicTarget?: boolean;
 }
 
 // /* Export node-fetch Response */

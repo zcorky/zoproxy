@@ -138,10 +138,10 @@ export class Proxy extends Onion {
 
   private useFinalTarget(): Middleware<Context> {
     return async (ctx, next) => {
-      const { target: _target, enableDynamicTarget } = this.config!;
-      const { target: _dynamicTarget } = ctx.input.request;
+      const { target } = ctx.input.request;
 
-      (ctx.state as any).target = getTarget(_target, _dynamicTarget, enableDynamicTarget);
+      // set target
+      (ctx.state as any).target = getTarget(target);
 
       await next!();
     };
@@ -184,7 +184,7 @@ export class Proxy extends Onion {
       
       if (!cache.get(tickKey)) {
         debug(
-          'Gateway:', this.config.target || 'None',
+          'Gateway:', ctx.state.target || 'None',
           'Count:', `${requestCount.all}/${requestCount.fail}`);
     
         cache.set(tickKey, true, { maxAge: 10000 });

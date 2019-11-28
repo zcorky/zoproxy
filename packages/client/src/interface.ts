@@ -10,6 +10,9 @@ export interface ProxyClientConfig extends Omit<Config, 'target'> {
   method: string; // 'POST';
   endpoint: string;
   headers?: Headers;
+
+  // dynamic target, enable request with target
+  enableDynamicTarget?: boolean;
 }
 
 export interface RequestInput {

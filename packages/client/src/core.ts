@@ -7,22 +7,26 @@ import { ProxyClientConfig, RequestInput, RequestOptions, RequestOutput, ClientR
 const debug = require('debug')('@zoproxy/client');
 
 export class ProxyClient {
-  private core = new Proxy({ ...this.config, target: this.config.registry });
+  private core = new Proxy(this.config);
   private logger = getLogger('zoproxy.client');
 
   constructor(public readonly config: ProxyClientConfig) {
 
   }
 
-  private getTarget(requestOptions: RequestOptions) {
+  private getRegistry() {
+    return this.config.registry;
+  }
+
+  private getDataTarget(requestOptions?: RequestOptions) {
     const { registry, enableDynamicTarget } = this.config;
-    const { target: _dynamicTarget } = requestOptions;
+    const { target: _dynamicTarget } = requestOptions || {};
 
     if (enableDynamicTarget && _dynamicTarget) {
       return _dynamicTarget;
     }
 
-    return registry;
+    return `decided by ${registry}`
   }
 
   // path to registry
@@ -54,7 +58,7 @@ export class ProxyClient {
   private getBody(body: RequestInput, options: RequestOptions): ClientRequestBody {
     const attributes = {
       handshake: options.handshake,
-      target: options.target,
+      target: this.config.enableDynamicTarget && options.target || undefined, // @TODO only enable target will allow target, or null
     };
 
     const values = {
@@ -74,19 +78,23 @@ export class ProxyClient {
   }
 
   public async request(input: RequestInput, options: RequestOptions): Promise<RequestOutput> {
-    const target = this.getTarget(options);
+    const registry = this.getRegistry();
 
+    const dataTarget = this.getDataTarget(options);
     const method = this.getMethod();
     const path = this.getPath();
     const headers = this.getHeaders(options);
     const body = JSON.stringify(this.getBody(input, options));
 
-    this.logger.info('=>', input.method, input.path, '-', target);
+    this.logger.info('=>', input.method, input.path, '-', dataTarget);
 
     const {
       response,
       requestTime,
-    } = await this.core.request({ method, path, headers, body });
+    } = await this.core.request({
+      target: registry, // registry
+      method, path, headers, body,
+    });
 
     this.logger.info('<=', input.method, input.path, response.status, `+${requestTime}ms`);
     

@@ -11,11 +11,15 @@ export interface ProxyServerConfig extends Config {
   endpoint: string;
 
   // server => origin data server
+  target: string;
   headers?: Headers;
   // target: string;
 
   // handshake
   onHandShake: HandShakeMethod;
+
+  // dynamic target, enable client request with target
+  enableDynamicTarget?: boolean;
 }
 
 export interface RequestInput {

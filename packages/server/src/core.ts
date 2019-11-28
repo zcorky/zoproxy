@@ -20,7 +20,8 @@ export class ProxyServer {
   // target server, from client
   private getTarget(body: RequestBodyFromClient) {
     const { enableDynamicTarget } = this.config;
-    if (enableDynamicTarget && body.attributes.target) {
+    // @TODO
+    if (enableDynamicTarget && body && body.attributes && body.attributes.target) {
       return body.attributes.target;
     }
 

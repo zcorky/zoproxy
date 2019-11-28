@@ -18,6 +18,7 @@ app.use((() => {
     registry: 'http://127.0.0.1:8090',
     method: 'POST',
     endpoint: '/proxy',
+    enableDynamicTarget: true,
   });
 
   return async (ctx, next) => {

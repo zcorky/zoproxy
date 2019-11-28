@@ -1,7 +1,3 @@
-export function getTarget(target: string, dynamicTarget: string, enableDynamicTarget: boolean): string {
-  if (enableDynamicTarget && dynamicTarget) {
-    return dynamicTarget;
-  }
-
+export function getTarget(target: string): string {
   return target;
 }
