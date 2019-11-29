@@ -70,6 +70,8 @@ export class ProxyClient {
         // request method option headers
         ...options.dataHeaders,
       },
+      // remove invalid body on request method
+      body: !body.method || ['GET', 'HEAD'].includes(body.method) ? undefined : body.body,
     };
 
     const timestamps = +new Date();
