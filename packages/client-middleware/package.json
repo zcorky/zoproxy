@@ -1,6 +1,6 @@
 {
   "name": "@zoproxy/client-middleware",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A Simple Proxy Framework Core",
   "keywords": [
     "proxy",
@@ -74,7 +74,7 @@
     "@koex/core": "^0.0.24",
     "@zodash/logger": "^0.0.5",
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/client": "^0.0.20",
+    "@zoproxy/client": "^0.0.21",
     "debug": "^4.1.1"
   }
 }
