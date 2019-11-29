@@ -5,7 +5,9 @@ import { createProxyClient } from '../../src/koex';
 
 const app = new App();
 
-app.use(body());
+app.use(body({
+  enableTypes: ['json', 'form', 'multipart'],
+}));
 
 app.use(createProxyClient({
   registry: 'http://127.0.0.1:8090',
@@ -34,6 +36,7 @@ app.use(async (ctx, next) => {
     return next();
   }
 
+  console.log('body: ', ctx.request.body);
   const response = await ctx.proxyClient.request(ctx.request.body);
 
   ctx.set(response.headers.raw() as any);
