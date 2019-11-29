@@ -437,7 +437,5 @@ function jsonToFormData(json: Record<string, any>) {
     formData.append(key, value);
   }
 
-  console.log('fff: ', formData);
-
   return formData;
 }
