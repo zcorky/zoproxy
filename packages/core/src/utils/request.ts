@@ -4,15 +4,16 @@ import { getUserAgent } from './get-user-agent';
 export async function request(input: RequestInfo, options: RequestInit) {
   const userAgent = getUserAgent();
 
-  return fetch(input, {
-    method: options.method,
-    headers: {
-      ...options.headers,
-      'user-agent': userAgent,
-    },
-    body: options.body,
-    redirect: options.redirect,
-  });
+  // return fetch(input, {
+  //   method: options.method,
+  //   headers: {
+  //     ...options.headers,
+  //     'user-agent': userAgent,
+  //   },
+  //   body: options.body,
+  //   redirect: options.redirect,
+  // });
+  return fetch(input, options);
 }
 
 export function createServerRequest() {
