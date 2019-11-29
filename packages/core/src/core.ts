@@ -4,7 +4,9 @@ import { Onion, Input, Middleware, Context } from '@zodash/onion';
 import LRU from '@zcorky/lru';
 import { md5 } from '@zodash/crypto/lib/md5';
 import { omit } from '@zodash/omit';
+
 import * as qs from '@zcorky/query-string';
+import * as FormData from 'form-data';
 
 import { request } from './utils/request';
 
@@ -114,7 +116,7 @@ export class Proxy extends Onion {
     // 9.2 x-www-form-urlencoded - query-string
     this.use(this.useModifyBodyByUrlencoded());
     // 9.3 form-data - FormData
-    // @TODO
+    this.use(this.useModifyBodyByFormData());
   }
 
   private useCopyStateToOutput(): Middleware<Context> {
@@ -373,13 +375,45 @@ export class Proxy extends Onion {
         return next!();
       }
 
-      const _body = safeParseBody(body);
+      const _body = safeParseBody(body as string);
 
       //
       const _headers = new Headers(headers);
       const contentType = _headers.get('Content-Type');
       if (_body && contentType && contentType.includes('application/x-www-form-urlencoded')) {
         ctx.input.request.body = qs.stringify(_body);
+      }
+
+      await next!();
+    };
+  }
+
+  // 9.3 form-data - FormData
+  private useModifyBodyByFormData(): Middleware<Context> {
+    return async (ctx, next) => {
+      const { headers, body } = ctx.input.request;
+      // already encoded string
+      if (!body) {
+        return next!();
+      }
+
+      const _body = safeParseBody(body as string);
+
+      //
+      const _headers = new Headers(headers);
+      const contentType = _headers.get('Content-Type');
+      if (_body && contentType && contentType.includes('multipart/form-data')) {
+        // remove origin form-data type
+        _headers.delete('Content-Type');
+
+        // @TODO this will change headers type
+        // ctx.input.request.headers = _headers as any;
+        const n_headers = {};
+        for (const [key, value] of _headers.entries() as any) {
+          n_headers[key] = value;
+        }
+        ctx.input.request.headers = n_headers;
+        ctx.input.request.body = jsonToFormData(_body);
       }
 
       await next!();
@@ -393,4 +427,17 @@ function safeParseBody(body: string) {
   } catch (error) {
 
   }
+}
+
+function jsonToFormData(json: Record<string, any>) {
+  const formData = new FormData();
+
+  for (const key in json) {
+    const value = json[key];
+    formData.append(key, value);
+  }
+
+  console.log('fff: ', formData);
+
+  return formData;
 }

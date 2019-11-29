@@ -1,4 +1,5 @@
 import { Response } from 'node-fetch';
+import * as FormData from 'form-data';
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTION' | string;
 
@@ -13,7 +14,7 @@ export type Headers = Record<string, string>;
 
 // export type Params = any;
 
-export type Body = string;
+export type Body = string | FormData;
 
 export interface RequestInput {
   method: Method;
