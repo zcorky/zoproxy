@@ -2,7 +2,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "0.0.17",
+  "version": "0.0.18",
   "command": {
     "publish": {
       "npmClient": "npm",
@@ -22,7 +22,9 @@
     },
     "bootstrap": {
       "npmClient": "npm",
-      "npmClientArgs": ["--no-package-lock"]
+      "npmClientArgs": [
+        "--no-package-lock"
+      ]
     }
   },
   "changelog": {
