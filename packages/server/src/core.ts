@@ -63,13 +63,13 @@ export class ProxyServer {
     // set handshake
     this.setHandShake(handshake);
 
-    if (headers['Content-Type'] && headers['Content-Type'].includes('json')) {
-      return JSON.stringify(_body);
-    }
+    // if (headers['Content-Type'] && headers['Content-Type'].includes('json')) {
+    //   return JSON.stringify(_body);
+    // }
 
-    if (headers['Content-Type'] && headers['Content-Type'].includes('form-data')) {
-      return qs.stringify(_body);
-    }
+    // if (headers['Content-Type'] && headers['Content-Type'].includes('form-data')) {
+    //   return qs.stringify(_body);
+    // }
 
     return _body;
   }
