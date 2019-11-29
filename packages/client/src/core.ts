@@ -74,8 +74,6 @@ export class ProxyClient {
       body: !body.method || ['GET', 'HEAD'].includes(body.method) ? undefined : body.body,
     };
 
-    console.log('xxx: ', values);
-
     const timestamps = +new Date();
 
     return { attributes, values, timestamps };

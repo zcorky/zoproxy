@@ -82,8 +82,6 @@ export class ProxyServer {
     const headers = this.getHeaders(input, options);
     const body = JSON.stringify(this.getBody(input));
 
-    console.log('yyy: ', input);
-
     this.logger.info('=>', method, path, '-', target);
     
     const { response, requestTime } = await this.core.request({
