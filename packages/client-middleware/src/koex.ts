@@ -46,7 +46,7 @@ export function createProxyClient(options: Options): Middleware<Context> {
       ? await options.serverHeaders(ctx) : options.serverHeaders;
     const dataHeaders = typeof options.dataHeaders === 'function'
       ? await options.dataHeaders(ctx) : options.dataHeaders;
-      console.log('body: ', (ctx.request as any).body);
+      
     const response = await proxy.request({
       method: ctx.method,
       path: ctx.path.replace(options.clientEndpoint, ''), // @TODO
