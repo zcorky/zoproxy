@@ -21,7 +21,8 @@
       "conventionalCommits": true
     },
     "bootstrap": {
-      "npmClient": "npm"
+      "npmClient": "npm",
+      "npmClientArgs": ["--no-package-lock"]
     }
   },
   "changelog": {
