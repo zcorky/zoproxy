@@ -1,9 +1,10 @@
-import { Response } from 'node-fetch';
+import { Response, Headers } from 'node-fetch';
 import { Onion, Input, Middleware, Context } from '@zodash/onion';
 // import { getLogger } from '@zodash/logger';
 import LRU from '@zcorky/lru';
 import { md5 } from '@zodash/crypto/lib/md5';
 import { omit } from '@zodash/omit';
+import * as qs from '@zcorky/query-string';
 
 import { request } from './utils/request';
 
@@ -63,6 +64,7 @@ export class Proxy extends Onion {
       const body = getBody(_body, method);
 
       // debug('=>', method, url);
+      // console.log('core: ', method, url, headers, typeof _body, _body);
       
       const response = await request(url, {
         method,
@@ -106,6 +108,13 @@ export class Proxy extends Onion {
     this.use(this.useChangeRequestHeaders());
     // 8.change response header
     this.use(this.useChangeResponseHeaders());
+    // 9.content-type
+    // 9.1 json
+    // ignore
+    // 9.2 x-www-form-urlencoded - query-string
+    this.use(this.useModifyBodyByUrlencoded());
+    // 9.3 form-data - FormData
+    // @TODO
   }
 
   private useCopyStateToOutput(): Middleware<Context> {
@@ -353,5 +362,35 @@ export class Proxy extends Onion {
       // avoiding Zlib.zlibOnError
       response.headers.delete('content-encoding');
     };
+  }
+
+  // 9.2 x-www-form-urlencoded - query-string
+  private useModifyBodyByUrlencoded(): Middleware<Context> {
+    return async (ctx, next) => {
+      const { headers, body } = ctx.input.request;
+      // already encoded string
+      if (!body) {
+        return next!();
+      }
+
+      const _body = safeParseBody(body);
+
+      //
+      const _headers = new Headers(headers);
+      const contentType = _headers.get('Content-Type');
+      if (_body && contentType && contentType.includes('application/x-www-form-urlencoded')) {
+        ctx.input.request.body = qs.stringify(_body);
+      }
+
+      await next!();
+    };
+  }
+}
+
+function safeParseBody(body: string) {
+  try {
+    return JSON.parse(body);
+  } catch (error) {
+
   }
 }

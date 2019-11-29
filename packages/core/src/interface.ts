@@ -13,7 +13,7 @@ export type Headers = Record<string, string>;
 
 // export type Params = any;
 
-export type Body = any;
+export type Body = string;
 
 export interface RequestInput {
   method: Method;
