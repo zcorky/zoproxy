@@ -31,25 +31,25 @@ app.use(createProxyServer({
   enableDynamicTarget: true,
 }));
 
-app.use(async (ctx, next) => {
-  if (!ctx.path.startsWith('/api')) {
-    return next();
-  }
+// app.use(async (ctx, next) => {
+//   if (!ctx.path.startsWith('/api')) {
+//     return next();
+//   }
 
-  const response = await ctx.proxyServer.request(ctx.request.body);
+//   const response = await ctx.proxyServer.request(ctx.request.body);
 
-  ctx.set(response.headers.raw() as any);
-  ctx.status = response.status;
-  ctx.body = response.body;
-});
+//   ctx.set(response.headers.raw() as any);
+//   ctx.status = response.status;
+//   ctx.body = response.body;
+// });
 
-app.get('/github/:username', async (ctx) => {
-  const response = await ctx.proxyServer.request(ctx.request.body);
+// app.get('/github/:username', async (ctx) => {
+//   const response = await ctx.proxyServer.request(ctx.request.body);
 
-  ctx.set(response.headers.raw() as any);
-  ctx.status = response.status;
-  ctx.body = response.body;
-});
+//   ctx.set(response.headers.raw() as any);
+//   ctx.status = response.status;
+//   ctx.body = response.body;
+// });
 
 
 // app.use(async (ctx, next) => {
