@@ -1,5 +1,6 @@
+import { Output } from './core';
 import { Response, Headers } from 'node-fetch';
-import { Onion, Input, Middleware, Context } from '@zodash/onion';
+import { Onion, Middleware, Context } from '@zodash/onion';
 // import { getLogger } from '@zodash/logger';
 import LRU from '@zcorky/lru';
 import { md5 } from '@zodash/crypto/lib/md5';
@@ -21,27 +22,23 @@ import { getBody } from './utils/get-body';
 
 const debug = require('debug')('@zoproxy/core');
 
-declare module '@zodash/onion' {
-  export interface Input  {
-    request: RequestInput;
-  }
+export interface Input  {
+  request: RequestInput;
+}
 
-  export interface Output extends RequestOutput {
+export interface Output extends RequestOutput {
 
-  }
+}
 
-  export interface Context {
-    state: {
-      readonly requestStartTime: number;
-      readonly requestCount: { all: number, fail: number, count(type: 'all' | 'fail'): void };
-      readonly requestCache: LRU<string, RequestOutput>;
-      readonly target: string;
+export interface State {
+  readonly requestStartTime: number;
+  readonly requestCount: { all: number, fail: number, count(type: 'all' | 'fail'): void };
+  readonly requestCache: LRU<string, RequestOutput>;
+  readonly target: string;
 
-      requestTime: number;
+  requestTime: number;
 
-      md5Key: string;
-    };
-  }
+  md5Key: string;
 }
 
 /**
@@ -51,14 +48,14 @@ export {
   Response,
 };
 
-export class Proxy extends Onion {
+export class Proxy extends Onion<Input, Output, State> {
   constructor(public readonly config: Config) {
     super();
 
     this.setup();
   }
 
-  public handle(): Middleware<Context> {
+  public handle(): Middleware<Context<Input, Output, State>> {
     return async (ctx) => {
       const { method, path, headers, body: _body } = ctx.input.request;
 
@@ -119,7 +116,7 @@ export class Proxy extends Onion {
     this.use(this.useModifyBodyByFormData());
   }
 
-  private useCopyStateToOutput(): Middleware<Context> {
+  private useCopyStateToOutput(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       await next();
 
@@ -128,7 +125,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useRequestTime(): Middleware<Context> {
+  private useRequestTime(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       // init
       if (!ctx.state) {
@@ -147,7 +144,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useFinalTarget(): Middleware<Context> {
+  private useFinalTarget(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       const { target } = ctx.input.request;
 
@@ -158,7 +155,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useRecordAccess(): Middleware<Context> {
+  private useRecordAccess(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       const { target } = ctx.state;
       const { method, path } = ctx.input.request;
@@ -176,7 +173,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useCountRequest(): Middleware<Context> {
+  private useCountRequest(): Middleware<Context<Input, Output, State>> {
     const requestCount = {
       all: 0,
       fail: 0,
@@ -205,7 +202,7 @@ export class Proxy extends Onion {
     };
   }
   
-  private useCache(): Middleware<Context> {
+  private useCache(): Middleware<Context<Input, Output, State>> {
     const memoryCache = new LRU<string, RequestOutput>();
 
     return async (ctx, next) => {
@@ -254,7 +251,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useCatchError(): Middleware<Context> {
+  private useCatchError(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       try {
         await next!();
@@ -285,7 +282,7 @@ export class Proxy extends Onion {
     }
   }
 
-  private useStatusError(): Middleware<Context> {
+  private useStatusError(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       await next!();
 
@@ -338,7 +335,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useChangeRequestHeaders(): Middleware<Context> {
+  private useChangeRequestHeaders(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       const originHeaders = ctx.input.request.headers;
 
@@ -350,7 +347,7 @@ export class Proxy extends Onion {
     };
   }
 
-  private useChangeResponseHeaders(): Middleware<Context> {
+  private useChangeResponseHeaders(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       await next!();
 
@@ -367,7 +364,7 @@ export class Proxy extends Onion {
   }
 
   // 9.2 x-www-form-urlencoded - query-string
-  private useModifyBodyByUrlencoded(): Middleware<Context> {
+  private useModifyBodyByUrlencoded(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       const { headers, body } = ctx.input.request;
       // already encoded string
@@ -389,7 +386,7 @@ export class Proxy extends Onion {
   }
 
   // 9.3 form-data - FormData
-  private useModifyBodyByFormData(): Middleware<Context> {
+  private useModifyBodyByFormData(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
       const { headers, body } = ctx.input.request;
       // already encoded string
