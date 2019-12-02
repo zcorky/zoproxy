@@ -1,4 +1,3 @@
-import { Output } from './core';
 import { Response, Headers } from 'node-fetch';
 import { Onion, Middleware, Context } from '@zodash/onion';
 // import { getLogger } from '@zodash/logger';
