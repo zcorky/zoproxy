@@ -101,4 +101,9 @@ export interface RequestBodyFromClient {
    * timestamps
    */
   timestamps: number;
+
+  /**
+   * files
+   */
+  files: any;
 }

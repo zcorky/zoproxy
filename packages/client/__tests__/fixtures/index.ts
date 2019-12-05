@@ -11,7 +11,14 @@ declare module '@koex/core' {
 
 const app = new App();
 
-app.use(body());
+app.use(body({
+  enableTypes: [
+    'form',
+    'json',
+    'multipart',
+    'text'
+  ],
+}));
 
 app.use((() => {
   const proxy = new ProxyClient({
@@ -33,12 +40,15 @@ app.use(async (ctx, next) => {
     return next();
   }
 
+  // console.log('afiles: ', ctx.request.files);
+
   try {
     const response = await ctx.proxyClient.request({
       method: ctx.method,
       path: ctx.path.replace('/api', ''),
       headers: ctx.headers,
       body: ctx.request.body,
+      files: ctx.request.files,
     }, {
       // target: 'https://api.github.com',
       handshake: {
