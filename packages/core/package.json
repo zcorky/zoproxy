@@ -1,6 +1,6 @@
 {
   "name": "@zoproxy/core",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "A Simple Proxy Framework Core",
   "keywords": [
     "proxy",
