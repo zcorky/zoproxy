@@ -24,7 +24,7 @@ export interface RequestInput {
   files?: any;
 
   // only works when enableDynamicTarget
-  target: string;
+  target?: string;
 }
 
 export interface RequestOutput {
