@@ -23,8 +23,8 @@ export interface RequestInput {
   body?: Body;
   files?: any;
 
-  // only works when enableDynamicTarget
-  target?: string;
+  // proxy target is required, or you donot know where to target
+  target: string;
 }
 
 export interface RequestOutput {
