@@ -118,7 +118,7 @@ export class Proxy extends Onion<Input, Output, State> {
 
   private useCopyStateToOutput(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
-      await next();
+      await next!();
 
       // requestTime
       ctx.output.requestTime = ctx.state.requestTime;
