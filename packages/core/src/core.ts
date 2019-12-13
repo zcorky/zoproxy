@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { Response, Headers } from 'node-fetch';
 import { Onion, Middleware, Context } from '@zodash/onion';
 // import { getLogger } from '@zodash/logger';
@@ -63,7 +64,7 @@ export class Proxy extends Onion<Input, Output, State> {
 
       // debug('=>', method, url);
       // console.log('core: ', method, url, headers, typeof _body, _body);
-      
+
       const response = await request(url, {
         method,
         headers,
@@ -387,7 +388,7 @@ export class Proxy extends Onion<Input, Output, State> {
   // 9.3 form-data - FormData
   private useModifyBodyByFormData(): Middleware<Context<Input, Output, State>> {
     return async (ctx, next) => {
-      const { headers, body } = ctx.input.request;
+      const { headers, body, files } = ctx.input.request;
       // already encoded string
       if (!body) {
         return next!();
@@ -408,8 +409,9 @@ export class Proxy extends Onion<Input, Output, State> {
         for (const [key, value] of _headers.entries() as any) {
           n_headers[key] = value;
         }
+
         ctx.input.request.headers = n_headers;
-        ctx.input.request.body = jsonToFormData(_body);
+        ctx.input.request.body = jsonToFormData(_body, files);
       }
 
       await next!();
@@ -425,12 +427,22 @@ function safeParseBody(body: string) {
   }
 }
 
-function jsonToFormData(json: Record<string, any>) {
+function jsonToFormData(json: Record<string, any>, files?: object) {
   const formData = new FormData();
 
   for (const key in json) {
     const value = json[key];
     formData.append(key, value);
+  }
+
+  if (files) {
+    for (const key in files) {
+      const file = files[key];
+      formData.append(key, fs.createReadStream(file.path), {
+        filename: file.name,
+        contentType: file.type,
+      });
+    }
   }
 
   return formData;

@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { Proxy, Response } from '@zoproxy/core';
+import { Proxy } from '@zoproxy/core';
 import { getLogger } from '@zodash/logger';
 
 import { ProxyClientConfig, RequestInput, RequestOptions, RequestOutput, ClientRequestBody } from './interface';
@@ -44,7 +44,16 @@ export class ProxyClient {
   }
 
   // headers to registry
-  private getHeaders(options: RequestOptions) {
+  private getHeaders(input: RequestInput, options: RequestOptions) {
+    if (this.isFormData(input)) {
+      return {
+        ...this.config.headers,
+        ...options.serverHeaders,
+        'User-Agent': 'ProxyClient/v0.0.0',
+        'Content-Type': 'multipart/form-data',
+      }; 
+    }
+
     return {
       ...this.config.headers,
       ...options.serverHeaders,
@@ -55,7 +64,7 @@ export class ProxyClient {
 
   // proxy data to registry
   //  => { attributes: { handshake, target }, values: { method path headers body }, timestamps }
-  private getBody(body: RequestInput, options: RequestOptions): ClientRequestBody {
+  private getBody(body: RequestInput, options: RequestOptions): string {
     const attributes = {
       handshake: options.handshake,
       target: this.config.enableDynamicTarget && options.target || undefined, // @TODO only enable target will allow target, or null
@@ -76,7 +85,15 @@ export class ProxyClient {
 
     const timestamps = +new Date();
 
-    return { attributes, values, timestamps };
+    const data: ClientRequestBody = { attributes, values, timestamps };
+
+    if (!this.isFormData(body)) {
+      return JSON.stringify(data);
+    }
+
+    return JSON.stringify({
+      'formData': JSON.stringify(data),
+    });
   }
 
   public async request(input: RequestInput, options: RequestOptions): Promise<RequestOutput> {
@@ -85,8 +102,9 @@ export class ProxyClient {
     const dataTarget = this.getDataTarget(options);
     const method = this.getMethod();
     const path = this.getPath();
-    const headers = this.getHeaders(options);
-    const body = JSON.stringify(this.getBody(input, options));
+    const headers = this.getHeaders(input, options);
+    const body = this.getBody(input, options);
+    const files = input.files;
 
     this.logger.info('=>', input.method, input.path, '-', dataTarget);
 
@@ -95,7 +113,7 @@ export class ProxyClient {
       requestTime,
     } = await this.core.request({
       target: registry, // registry
-      method, path, headers, body,
+      method, path, headers, body, files,
     });
 
     this.logger.info('<=', input.method, input.path, response.status, `+${requestTime}ms`);
@@ -117,5 +135,10 @@ export class ProxyClient {
     // }
 
     return response;
+  }
+
+  public isFormData(input: RequestInput) {
+    const contentType = input.headers['content-type'];
+    return contentType && contentType.includes('multipart/form-data');
   }
 }

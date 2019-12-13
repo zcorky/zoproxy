@@ -20,6 +20,7 @@ export interface RequestInput {
   path: string;
   headers: Headers,
   body: any;
+  files?: any;
 }
 
 export interface RequestOptions extends ClientProxyAttributes {

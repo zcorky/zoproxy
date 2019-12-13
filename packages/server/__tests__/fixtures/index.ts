@@ -11,11 +11,18 @@ declare module '@koex/core' {
 
 const app = new App();
 
-app.use(body());
+app.use(body({
+  enableTypes: [
+    'form',
+    'json',
+    'multipart',
+    'text'
+  ],
+}));
 
 app.use((() => {
   const proxy = new ProxyServer({
-    target: 'http://httpbin.zcorky.com',
+    target: 'https://httpbin.zcorky.com',
     method: 'POST',
     endpoint: '/proxy',
     enableDynamicTarget: true,
@@ -57,7 +64,10 @@ app.use((() => {
 // });
 
 app.post('/proxy', async (ctx) => {
-  const response = await ctx.proxyServer.request(ctx.request.body);
+  const response = await ctx.proxyServer.request({
+    ...ctx.request.body,
+    files: ctx.request.files,
+  });
 
   ctx.set(response.headers.raw() as any);
   ctx.status = response.status;

@@ -1,6 +1,4 @@
-import { Proxy, Response } from '@zoproxy/core';
-import * as qs from '@zcorky/query-string';
-import { Middleware, Context } from '@zodash/onion';
+import { Proxy } from '@zoproxy/core';
 import { getLogger } from '@zodash/logger';
 
 import {
@@ -17,7 +15,6 @@ const HANDSHAKE = Symbol('handshake');
 export class ProxyServer {
   private core: Proxy;
   private logger = getLogger('zoproxy.server');
-  private handshake: any;
 
   constructor(public readonly config: ProxyServerConfig) {
     this.core = new Proxy(this.config);
@@ -58,35 +55,29 @@ export class ProxyServer {
   // body to target server, from client
   private getBody(body: RequestBodyFromClient): any {
     const { handshake } = body.attributes;
-    const { headers, body: _body } = body.values;
+    const { body: _body } = body.values;
 
     // set handshake
     this.setHandShake(handshake);
-
-    // if (headers['Content-Type'] && headers['Content-Type'].includes('json')) {
-    //   return JSON.stringify(_body);
-    // }
-
-    // if (headers['Content-Type'] && headers['Content-Type'].includes('form-data')) {
-    //   return qs.stringify(_body);
-    // }
 
     return _body;
   }
 
   public async request(input: RequestBodyFromClient, options?: RequestOptionsFromServer): Promise<RequestOutputFromTarget> {
     const target = this.getTarget(input);
+    const _input = (input as any).formData ? JSON.parse((input as any).formData) : input;
 
-    const method = this.getMethod(input);
-    const path = this.getPath(input);
-    const headers = this.getHeaders(input, options);
-    const body = JSON.stringify(this.getBody(input));
+    const method = this.getMethod(_input);
+    const path = this.getPath(_input);
+    const headers = this.getHeaders(_input, options);
+    const body = JSON.stringify(this.getBody(_input));
+    const files = input.files;
 
     this.logger.info('=>', method, path, '-', target);
     
     const { response, requestTime } = await this.core.request({
       target,
-      method, path, headers, body,
+      method, path, headers, body, files,
     });
     
     this.logger.info('<=', method, path, response.status, `+${requestTime}ms`);

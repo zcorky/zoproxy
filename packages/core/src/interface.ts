@@ -21,6 +21,7 @@ export interface RequestInput {
   path: Path;
   headers: Headers;
   body?: Body;
+  files?: any;
 
   // only works when enableDynamicTarget
   target: string;
