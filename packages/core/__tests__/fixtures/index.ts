@@ -15,8 +15,8 @@ app.use(body());
 
 app.use((() => {
   const proxy = new Proxy({
-    target: 'https://httpbin.zcorky.com',
-    enableDynamicTarget: true,
+    // target: 'https://httpbin.zcorky.com',
+    // enableDynamicTarget: true,
   });
 
   return async (ctx, next) => {
@@ -43,7 +43,8 @@ app.use(async (ctx, next) => {
 });
 
 app.get('/github/:username', async (ctx) => {
-  const response = await ctx.proxy.request({
+  const { response } = await ctx.proxy.request({
+    target: 'https://httpbin.zcorky.com',
     method: ctx.method,
     path: `/users/${ctx.params.username}`,
     headers: ctx.headers,
@@ -55,7 +56,8 @@ app.get('/github/:username', async (ctx) => {
 });
 
 app.get('/md5/:value', async (ctx) => {
-  const response = await ctx.proxy.request({
+  const { response } = await ctx.proxy.request({
+    target: 'https://httpbin.zcorky.com',
     method: ctx.method,
     path: `/md5/${ctx.params.value}`,
     headers: ctx.headers,
@@ -67,7 +69,8 @@ app.get('/md5/:value', async (ctx) => {
 });
 
 app.get('/zcorky/(.*)', async (ctx) => {
-  const response = await ctx.proxy.request({
+  const { response } = await ctx.proxy.request({
+    target: 'https://httpbin.zcorky.com',
     method: ctx.method,
     path: ctx.path.replace('/zcorky', ''),
     headers: ctx.headers,
