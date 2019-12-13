@@ -118,6 +118,17 @@ export class ProxyClient {
 
     this.logger.info('<=', input.method, input.path, response.status, `+${requestTime}ms`);
     
+    if (response.status < 200 || response.status >= 400) {
+      const _ = response.clone();
+      
+      // @TODO
+      try {
+        this.logger.debug(await _.text());
+      } catch (error) {
+        this.logger.debug(`No Content (Content-Type: ${response.headers.get('content-type')})`);
+      }
+    }
+
     // if (response.status >= 400 && response.status < 600) {
     //   const originBody = await response.json();
       
