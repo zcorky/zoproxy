@@ -31,11 +31,12 @@ app.use(async (ctx, next) => {
     return next();
   }
 
-  const response = await ctx.proxy.request({
+  const { response } = await ctx.proxy.request({
+    target: 'https://httpbin.zcorky.com',
     method: ctx.method,
     path: ctx.path.replace('/api', ''),
     headers: ctx.headers,
-    body: ctx.request.body,
+    body: JSON.stringify(ctx.request.body),
   });
 
   ctx.set(response.headers.raw() as any);
@@ -44,11 +45,11 @@ app.use(async (ctx, next) => {
 
 app.get('/github/:username', async (ctx) => {
   const { response } = await ctx.proxy.request({
-    target: 'https://httpbin.zcorky.com',
+    target: 'https://api.github.com',
     method: ctx.method,
     path: `/users/${ctx.params.username}`,
     headers: ctx.headers,
-    body: ctx.request.body,
+    body: JSON.stringify(ctx.request.body),
   });
 
   ctx.set(response.headers.raw() as any);
@@ -61,7 +62,7 @@ app.get('/md5/:value', async (ctx) => {
     method: ctx.method,
     path: `/md5/${ctx.params.value}`,
     headers: ctx.headers,
-    body: ctx.request.body,
+    body: JSON.stringify(ctx.request.body),
   });
 
   ctx.set(response.headers.raw() as any);
@@ -74,7 +75,7 @@ app.get('/zcorky/(.*)', async (ctx) => {
     method: ctx.method,
     path: ctx.path.replace('/zcorky', ''),
     headers: ctx.headers,
-    body: ctx.request.body,
+    body: JSON.stringify(ctx.request.body),
   });
 
   ctx.set(response.headers.raw() as any);
@@ -92,7 +93,7 @@ app.get('/zcorky/(.*)', async (ctx) => {
 //     method: ctx.method,
 //     path: ctx.path.replace('/api', ''),
 //     headers: ctx.headers,
-//     body: ctx.request.body,
+//     body: JSON.stringify(ctx.request.body),
 //   }, {
 //     handshake: {
 //       appId: 'app-claim',
