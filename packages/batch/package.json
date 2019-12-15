@@ -73,6 +73,7 @@
   "dependencies": {
     "@types/koa": "^2.11.0",
     "@zcorky/lru": "^1.0.3",
+    "@zcorky/query-string": "^1.0.2",
     "@zodash/crypto": "^0.0.7",
     "@zodash/logger": "^0.0.5",
     "@zodash/uuid": "^0.0.2",

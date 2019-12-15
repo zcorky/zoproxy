@@ -1,5 +1,6 @@
 import { Proxy, Config, RequestInput } from '@zoproxy/core';
 import { getLogger } from '@zodash/logger';
+import { stringify } from '@zcorky/query-string';
 
 import {
   PathRewriterBatchInput, PathRewriterInputOptions, createPathRewriterBatch,
@@ -11,7 +12,9 @@ export interface Options extends Config, PathRewriterInputOptions {
 
 const logger = getLogger('zoproxy.batch');
 
-export type Input = Omit<RequestInput, 'target'>;
+export type Input = Omit<RequestInput, 'target'> & {
+  query: string | Record<string, any>;
+};
 
 export function createProxy(options: Options) {
   const proxy = new Proxy(options);
@@ -27,12 +30,20 @@ export function createProxy(options: Options) {
       throw error;
     }
 
-    const { method, path } = input;
-    const { target } = _pathAndTarget;
+    const { method, query } = input;
+    const { target, path } = _pathAndTarget;
+
+    const finalPath = !query
+      ? path : typeof query === 'string'
+        ? `${path}?${query}` : stringify(query);
 
     logger.info('=>', method, _pathAndTarget.path, '-', target);
     
-    const res = await proxy.request({ ...input, ..._pathAndTarget });
+    const res = await proxy.request({
+      ...input,
+      target,
+      path: finalPath,
+    });
     
     logger.info('<=', method, _pathAndTarget.path, res.response.status, `+${res.requestTime}ms`);
 
