@@ -10,6 +10,7 @@ export function createMiddleware(options: Options) {
         path: ctx.path,
         method: ctx.method,
         headers: ctx.headers,
+        query: ctx.querystring,
         body: JSON.stringify((ctx.request as any).body),
         files: (ctx.request as any).files,
       });
