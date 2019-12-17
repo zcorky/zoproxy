@@ -35,7 +35,7 @@ export function createProxy(options: Options) {
 
     const finalPath = !query
       ? path : typeof query === 'string'
-        ? `${path}?${query}` : stringify(query);
+        ? `${path}?${query}` : `${path}?${stringify(query)}`;
 
     logger.info('=>', method, _pathAndTarget.path, '-', target);
     
