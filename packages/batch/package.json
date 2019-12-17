@@ -1,6 +1,6 @@
 {
   "name": "@zoproxy/batch",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "A Simple Proxy Framework Core",
   "keywords": [
     "proxy",
@@ -77,7 +77,7 @@
     "@zodash/crypto": "^0.0.7",
     "@zodash/logger": "^0.0.5",
     "@zodash/uuid": "^0.0.2",
-    "@zoproxy/core": "^0.0.30",
+    "@zoproxy/core": "^0.0.31",
     "debug": "^4.1.1"
   }
 }
