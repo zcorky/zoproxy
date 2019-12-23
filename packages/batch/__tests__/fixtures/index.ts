@@ -33,7 +33,9 @@ const proxy = createProxy({
   },
 });
 
-app.use(body());
+app.use(body({
+  enableTypes: ['json', 'form-data', 'multipart', 'text'] as any,
+}));
 
 app.use(async (ctx, next) => {
   try {
@@ -41,6 +43,7 @@ app.use(async (ctx, next) => {
       path: ctx.path,
       method: ctx.method,
       headers: ctx.headers,
+      // query: ctx.query,
       body: JSON.stringify(ctx.request.body),
       files: ctx.request.files,
     });
@@ -70,6 +73,8 @@ app.get('/', async (ctx) => {
   };
 });
 
-(app as any).listen(8080, '0.0.0.0', () => {
-  console.log('server start at: http://127.0.0.1:8080');
+const PORT = process.env.PORT || 8080;
+
+(app as any).listen(PORT, '0.0.0.0', () => {
+  console.log('server start at: http://127.0.0.1:' + PORT);
 });

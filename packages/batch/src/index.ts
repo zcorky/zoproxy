@@ -13,7 +13,7 @@ export interface Options extends Config, PathRewriterInputOptions {
 const logger = getLogger('zoproxy.batch');
 
 export type Input = Omit<RequestInput, 'target'> & {
-  query: string | Record<string, any>;
+  query?: string | Record<string, any>;
 };
 
 export function createProxy(options: Options) {
