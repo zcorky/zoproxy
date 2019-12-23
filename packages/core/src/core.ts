@@ -402,6 +402,8 @@ export class Proxy extends Onion<Input, Output, State> {
       if (_body && contentType && contentType.includes('multipart/form-data')) {
         // remove origin form-data type
         _headers.delete('Content-Type');
+        // remove origin content-length to fix java framework error
+        _headers.delete('Content-Length');
 
         // @TODO this will change headers type
         // ctx.input.request.headers = _headers as any;
@@ -410,8 +412,16 @@ export class Proxy extends Onion<Input, Output, State> {
           n_headers[key] = value;
         }
 
+        const formData = jsonToFormData(_body, files);
+
+        // apply form headers
+        const formHeaders = formData.getHeaders();
+        for (const key in formHeaders) {
+          n_headers[key] = formHeaders[key];
+        }
+
         ctx.input.request.headers = n_headers;
-        ctx.input.request.body = jsonToFormData(_body, files);
+        ctx.input.request.body = formData;
       }
 
       await next!();
