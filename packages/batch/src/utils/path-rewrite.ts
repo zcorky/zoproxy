@@ -74,7 +74,7 @@ export function createPathRewriterBatch(input: PathRewriterBatchInput, options?:
     .map(key => {
       return {
         re: new RegExp(key),
-        writer: createPathRewriter(input[key]),
+        writer: createPathRewriter(input[key], options),
       };
     });
 
