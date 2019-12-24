@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.33](https://github.com/zcorky/zodash/compare/v0.0.32...v0.0.33) (2019-12-24)
+
+**Note:** Version bump only for package @zoproxy/server-middleware
+
+
+
+
+
 ## [0.0.32](https://github.com/zcorky/zodash/compare/v0.0.31...v0.0.32) (2019-12-23)
 
 **Note:** Version bump only for package @zoproxy/server-middleware
