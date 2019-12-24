@@ -360,6 +360,8 @@ export class Proxy extends Onion<Input, Output, State> {
       response.headers.delete('transfer-encoding');
       // avoiding Zlib.zlibOnError
       response.headers.delete('content-encoding');
+      // remove content-length to fix browser drop some data, make the data broken
+      response.headers.delete('content-length');
     };
   }
 
