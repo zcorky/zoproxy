@@ -12,19 +12,19 @@ declare module '@koex/core' {
 const app = new App();
 const proxy = createProxy({
   table: {
-    '^/api/httpbin': {
+    '/api/httpbin': {
       target: 'https://httpbin.zcorky.com',
       pathRewrite: {
         '^/api/httpbin': '',
       },
     },
-    '^/api/github': {
+    '/api/github': {
       target: 'https://api.github.com',
       pathRewrite: {
         '^/api/github': '/users'
       },
     },
-    '^/api/md5': {
+    '/api/md5': {
       target: 'https://httpbin.zcorky.com',
       pathRewrite: {
         '^/api': ''
