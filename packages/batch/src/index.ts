@@ -18,7 +18,8 @@ export type Input = Omit<RequestInput, 'target'> & {
 
 export function createProxy(options: Options) {
   const proxy = new Proxy(options);
-  const rewrite = createPathRewriterBatch(options.table);
+  const { table, ..._options } = options;
+  const rewrite = createPathRewriterBatch(table, _options);
 
   return async (input: Input) => {
     const _pathAndTarget = rewrite(input.path);

@@ -17,6 +17,12 @@ const proxy = createProxy({
       pathRewrite: {
         '^/api/httpbin': '',
       },
+      env: {
+        prd: {
+          target: 'http://httpbin.org',
+          pathRewrite: {},
+        },
+      },
     },
     '/api/github': {
       target: 'https://api.github.com',
@@ -31,6 +37,7 @@ const proxy = createProxy({
       },
     },
   },
+  env: process.env.DEPLOY_ENV,
 });
 
 app.use(body({

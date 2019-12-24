@@ -32,8 +32,15 @@ export function createPathRewriter(input: PathRewriterInput, options?: PathRewri
   if (env && fromEnv[env]) {
     const extended = fromEnv[env];
 
+    // @TODO merge smartly
     for (const key in extended) {
-      if (typeof extended[key] !== 'undefined') {
+      if (key === 'pathRewrite') {
+        base[key] = base[key] || {};
+
+        for (const pr in extended[key]) {
+          base[key][pr] = extended[key][pr];
+        }
+      } else if (typeof extended[key] !== 'undefined') {
         base[key] = extended[key];
       }
     }
