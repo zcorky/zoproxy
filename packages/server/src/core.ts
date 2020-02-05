@@ -53,9 +53,10 @@ export class ProxyServer {
   }
 
   // body to target server, from client
-  private getBody(body: RequestBodyFromClient): any {
-    const { handshake } = body.attributes;
-    const { body: _body } = body.values;
+  // @TODO if multipart/form-data, body.formData is real body
+  private getBody(body: RequestBodyFromClient = {} as any): any {
+    const { handshake } = body.attributes || {};
+    const { body: _body } = body.values || {};
 
     // set handshake
     this.setHandShake(handshake);

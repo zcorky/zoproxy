@@ -149,7 +149,9 @@ export class ProxyClient {
   }
 
   public isFormData(input: RequestInput) {
-    const contentType = input.headers['content-type'];
+    // @TODO
+    const contentType = input.headers['content-type']
+      || input.headers['Content-Type'];
     return contentType && contentType.includes('multipart/form-data');
   }
 }

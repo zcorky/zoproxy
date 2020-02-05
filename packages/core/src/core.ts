@@ -450,9 +450,22 @@ function jsonToFormData(json: Record<string, any>, files?: object) {
   if (files) {
     for (const key in files) {
       const file = files[key];
-      formData.append(key, fs.createReadStream(file.path), {
-        filename: file.name,
-        contentType: file.type,
+
+      const field = typeof ~~key === 'number'
+        ? file.field // egg-multipart
+        : key; // koa-body
+      
+      const filename = file.name // koa-body
+        || file.filename; // egg-multipart
+      
+      const filepath = file.path // koa-body
+        || file.filepath; // egg-multipart
+
+      const contentType = file.type; // koa-body
+
+      formData.append(field, fs.createReadStream(filepath), {
+        filename,
+        contentType,
       });
     }
   }
